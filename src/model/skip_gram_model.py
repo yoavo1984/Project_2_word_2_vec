@@ -1,3 +1,5 @@
+import numpy as np
+
 class SkipGramModel(object):
     def __init__(self, hyperparameters, training_data):
         pass
@@ -41,3 +43,46 @@ class SkipGramModel(object):
                 negative sampled words
             """
             return 0.0
+
+class UniGram(object):
+    def __init__(self, corpus):
+        self.distribution = dict()
+        self.corpus = corpus
+
+        self.generate_unigram_distribution()
+
+    def generate_unigram_distribution(self):
+        num_of_words = self.corpus.get_number_of_words()
+
+        # count the number of times each words appear.
+        for word in self.corpus.iterate_words():
+            self.distribution[word] = self.distribution.get(word, 0) + 1
+
+        # Divide by the total number of words in the corpus to generate the uni gram distribution
+        for key, val in self.distribution.items():
+            self.distribution[key] = val / num_of_words
+
+    def ger_random_word(self):
+        # sample a random number between 1 and 0 uniformly.
+        words = list(self.distribution.keys())
+        p = list(self.distribution.values())
+
+        return np.random.choice(words, p=p)
+
+if __name__ == "__main__":
+    class mock_corpus():
+        def __init__(self):
+            self.str = "This is a long list of words you can use is is is is is is is is is"
+
+        def get_number_of_words(self):
+            return len(self.str.split())
+
+        def iterate_words(self):
+            for str in self.str.split():
+                yield str
+
+
+    corpus = mock_corpus()
+    uni = UniGram(corpus)
+    for i in range(10):
+        print(uni.ger_random_word())
