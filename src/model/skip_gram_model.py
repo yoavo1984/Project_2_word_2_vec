@@ -46,12 +46,21 @@ class SkipGramModel(object):
 
 class UniGram(object):
     def __init__(self, corpus):
+        """
+        A class to represent a uni gram model.
+        Args:
+            corpus: The corpus we want to generate to uni gram for.
+        """
         self.distribution = dict()
         self.corpus = corpus
 
         self.generate_unigram_distribution()
 
     def generate_unigram_distribution(self):
+        """
+        Generates the unigram distribution, counts number of occurrences for each words and
+        finishes off with dividing by the total number of words in the corpus.
+        """
         num_of_words = self.corpus.get_number_of_words()
 
         # count the number of times each words appear.
@@ -63,7 +72,11 @@ class UniGram(object):
             self.distribution[key] = val / num_of_words
 
     def ger_random_word(self):
-        # sample a random number between 1 and 0 uniformly.
+        """
+        Returns a random word from the corpus using a unigram distribution.
+        Returns:
+            (str) : The sampled word.
+        """
         words = list(self.distribution.keys())
         p = list(self.distribution.values())
 
