@@ -1,3 +1,5 @@
+import numpy as np
+
 class Corpus():
     def __init__(self, sentence_array, dictionary):
         self.corpus = []
@@ -7,6 +9,31 @@ class Corpus():
             for word in sentence:
                 word_id = dictionary.get_id_by_word(word)
                 self.corpus[index].append(word_id)
+
+    def sample_target_and_context(self, context_size):
+        sentence_num = np.random.randint(0, len(self.corpus))
+        sentence = self.corpus[sentence_num]
+
+        word_num = np.random.randint(0, len(sentence))
+        target = sentence[word_num]
+
+        context = self.get_word_context(sentence_num, word_num, context_size)
+
+        return target, context
+
+    def get_word_context(self, sen_num, word_num, context_size):
+        sentence = self.corpus[sen_num]
+        context = set()
+
+        for i in range(1, context_size + 1):
+            right_side = word_num + i
+            left_side = word_num - i
+            if right_side < len(sentence):
+                context.add(sentence[right_side])
+            if left_side >= 0:
+                context.add(sentence[left_side])
+
+        return context
 
     def iterate_words(self):
         for sentence in self.corpus:
@@ -24,8 +51,11 @@ if __name__ == "__main__":
                  ["this", "is", "the", "third", "one"]]
 
     di = WordIdDictionary(sentences)
-
     corpus = Corpus(sentences, di)
 
-    for sentence in corpus:
-        print (sentence)
+    for sen in corpus:
+        print (sen)
+
+    print()
+
+    print(corpus.sample_target_and_context(3))
