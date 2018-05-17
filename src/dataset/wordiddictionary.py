@@ -20,12 +20,28 @@ class WordIdDictionary():
                     word_id += 1
 
     def get_word_by_id(self, id):
+        """
+        Get a word from the dictionary by the word id.
+        Args:
+            id: The id of the word.
+
+        Returns:
+            If the id in the dictionary returns its word, else returns -1
+        """
         if id in self.twoWayDict:
             return self.twoWayDict[id]
         else:
             return -1
 
     def get_id_by_word(self, word):
+        """
+        Get an is from the dictionary by the word.
+        Args:
+            word: The word you want the id for.
+
+        Returns:
+            If the word in the dictionary returns its id, else returns -1
+        """
         if word in self.twoWayDict:
             return self.twoWayDict[word]
         else:
@@ -68,3 +84,4 @@ if __name__ == "__main__":
     print(di.get_word_by_id(1))
     print(di.get_word_by_id(2))
     print(di.get_word_by_id(5))
+    print(di.get_word_by_id(-1))
