@@ -15,7 +15,7 @@ class SentenceAssigner():
     def __init__(self, split_path):
         # Building the which will hold the assignments.
         num_sentences = count_lines_in_file(split_path)
-        self.assignments = np.zeros(num_sentences - 1)
+        self.assignments = np.zeros(num_sentences - 1) # Removing 1 since the first line is the header.
 
         # Setting values according to the file.
         self.build_assignment_array_from_file(split_path)
@@ -32,7 +32,7 @@ class SentenceAssigner():
         """
         return self.assignments[sentence_id]
 
-    # ***************************************************************** Private Methods ********************************
+    # ************************************** Private Methods *********************************************************
 
     def build_assignment_array_from_file(self, split_path):
         with open(split_path) as file:

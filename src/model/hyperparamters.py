@@ -1,4 +1,4 @@
-class hyperparameters(object):
+class Hyperparameters(object):
 
     def __init__(self, win_size, d, k, decay_rate, noise_d, seed):
         """
@@ -9,7 +9,7 @@ class hyperparameters(object):
             k(int): Number of "noncontext" negative words. 
             decay_rate(int): Number of iterations between reductions of the learning rate.
             noise_d(object): Choice of noise distribution.
-            seed(string): Random seed for governing randomness.
+            seed(int): Random seed for governing randomness.
         """
         self.win_size = win_size
         self.d = d

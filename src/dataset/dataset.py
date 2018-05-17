@@ -92,10 +92,13 @@ class Dataset(object):
 
         return words
 
+def get_dataset():
+    sc = SentenceAssigner("../../data/datasetSplit.txt")
+    dataset = Dataset("../../data/datasetSentences.txt", sc)
+
+    return dataset
 if __name__ == "__main__":
     sc = SentenceAssigner("../../data/datasetSplit.txt")
     dataset = Dataset("../../data/datasetSentences.txt", sc)
 
     train_corpus = dataset.train_corpus
-    for sen in train_corpus[5000:5010]:
-        print (sen)
