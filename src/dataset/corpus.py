@@ -1,7 +1,16 @@
 import numpy as np
 
 class Corpus():
+    """
+    This class serves as a cropus of words. 
+    The words are stored as id values, were the mapping between words and ids is defined by the
+    given dictionary.
+    Args:
+        sentence_array: The sentences to build our array from
+        dictionary: The dicitionary defining the mapping from words to ids.
+    """
     def __init__(self, sentence_array, dictionary):
+
         self.corpus = []
 
         for index, sentence in enumerate(sentence_array):
@@ -11,6 +20,14 @@ class Corpus():
                 self.corpus[index].append(word_id)
 
     def sample_target_and_context(self, context_size):
+        """
+        Samples a a target word and a context word uniformly from the corpus, according to the context size.
+        Args:
+            context_size: The size of the context window.
+
+        Returns: a word (target) and a set of words(contexts).
+
+        """
         sentence_num = np.random.randint(0, len(self.corpus))
         sentence = self.corpus[sentence_num]
 
@@ -36,6 +53,11 @@ class Corpus():
         return context
 
     def iterate_words(self):
+        """
+        Iterate over all the words in the corpus one by one.
+        Returns: Yields the words in the dictionary one by one.
+
+        """
         for sentence in self.corpus:
             for word in sentence:
                 yield word
