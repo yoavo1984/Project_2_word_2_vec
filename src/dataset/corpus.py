@@ -62,6 +62,14 @@ class Corpus():
             for word in sentence:
                 yield word
 
+    def get_words_count(self):
+        count = 0
+        for _ in self.iterate_words():
+            count += 1
+
+        return count
+
+
     def __iter__(self):
         for sentence in self.corpus:
             yield sentence
@@ -84,3 +92,6 @@ if __name__ == "__main__":
     print()
 
     print(corpus.sample_target_and_context(3))
+
+    print()
+    print(corpus.get_words_count())
