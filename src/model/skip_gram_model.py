@@ -1,4 +1,10 @@
+# Standard Libraries
 import numpy as np
+
+# Test imports
+from src.model.hyperparamters import Hyperparameters
+from src.dataset import dataset
+
 
 class SkipGramModel(object):
     def __init__(self, hyperparameters, training_corpus):
@@ -56,20 +62,43 @@ class SkipGramModel(object):
 
         return samples
 
-    def compute_log_probability(word_i, word_j, words_k):
+    def compute_log_probability(self, word_i, word_j, words_k):
         """
         Computes the log probability of word_i given word_j and K negative sampled
         words.
         Args:
-            word_i: Target word. 
-            word_j: Given context word
-            words_k: K sampled negative words
+            word_i: Context word. 
+            word_j: Given target word
+            words_k: K sampled negative context words
 
         Returns:
             The log probablity of the given Target word given the context word and K
             negative sampled words
         """
-        return 0.0
+        context_target_softmax = self.compute_softmax(word_i, word_j)
+        sum = np.log(context_target_softmax)
+
+        for word in words_k:
+            sum += np.log(1 - self.compute_softmax(word, word_j))
+
+        return sum
+
+    def compute_softmax(self, context, target):
+        # Get relevant vectors.
+        context_vector = self.context_vectors[context]
+        target_vector = self.target_vectors[target]
+
+        # Compute the dot product between the context vector and the target vector
+        target_context_dot_prod = np.exp(np.dot(target_vector, context_vector))
+
+        # Compute the sum of dot products of the target vector with all the contexts.
+        target_all_sum = sum(np.exp(self.context_vectors.dot(target_vector)))
+
+        # Compute the log to get the probability.
+        softmax = (target_context_dot_prod / target_all_sum)
+
+        return softmax
+
 
 class UniGram(object):
     def __init__(self, corpus):
@@ -88,7 +117,7 @@ class UniGram(object):
         Generates the unigram distribution, counts number of occurrences for each words and
         finishes off with dividing by the total number of words in the corpus.
         """
-        num_of_words = self.corpus.get_number_of_words()
+        num_of_words = self.corpus.get_words_count()
 
         # count the number of times each words appear.
         for word in self.corpus.iterate_words():
@@ -114,44 +143,27 @@ class UniGram(object):
 
     def set_alpha(self, alpha):
         self.reset_probabilites()
-        probabilites_sum = 0
+        probabilities_sum = 0
 
         for key,val in self.distribution.items():
             new_value = pow(val, alpha)
             self.distribution[key] = new_value
-            probabilites_sum += new_value
+            probabilities_sum += new_value
 
         for key,val in self.distribution.items():
-            self.distribution[key] = val / probabilites_sum
+            self.distribution[key] = val / probabilities_sum
 
 
 if __name__ == "__main__":
-    class mock_corpus():
-        def __init__(self):
-            self.str = "is is is is is is is is is is is is one"
+    hyperparameters = Hyperparameters(2, 10, 5, 10, 1, 123)
+    np.random.seed(123)
+    dataset_class = dataset.get_dataset()
+    train_corpus = dataset_class.train_corpus
 
-        def get_number_of_words(self):
-            return len(self.str.split())
+    sk_model = SkipGramModel(hyperparameters, train_corpus)
 
-        def iterate_words(self):
-            for str in self.str.split():
-                yield str
-
-
-    corpus = mock_corpus()
-    uni = UniGram(corpus)
-
-    print(" -- Unigram Sampling --")
     for i in range(10):
-        print(uni.sample_word())
+        k_words = sk_model.sample_k_words()
+        target, contexts = train_corpus.sample_target_and_context(3)
 
-    uni.set_alpha(0)
-
-    print("\n -- Uniform Sampling --")
-    for i in range(10):
-        print(uni.sample_word())
-
-    uni.set_alpha(0.5)
-    print("\n -- alpha=0.5 Sampling --")
-    for i in range(10):
-        print(uni.sample_word())
+        print(sk_model.compute_log_probability(contexts.pop(), target, k_words))
