@@ -5,6 +5,9 @@ import re
 from src.dataset.wordiddictionary import WordIdDictionary
 from src.dataset.corpus import Corpus
 
+# Test Imports
+from src.dataset.sentence_assignments import SentenceAssigner
+
 class Dataset(object):
     """
     This class is in charge of holding the entire dataset: Train and Test instances.
@@ -51,11 +54,11 @@ class Dataset(object):
 
     def set_test_train_sentences(self):
         for index, sentence in enumerate(self.sentences):
-            assignment = self.assigner(index)
+            assignment = self.assigner.assign(index)
             if assignment == 1:
-                self.train_sentences.add(sentence)
+                self.train_sentences.append(sentence)
             if assignment == 2:
-                self.test_sentences.add(sentence)
+                self.test_sentences.append(sentence)
 
     def generate_corpus(self, data_path):
         """
@@ -88,3 +91,11 @@ class Dataset(object):
         words = [x for x in line.split() if len(x) > 2]
 
         return words
+
+if __name__ == "__main__":
+    sc = SentenceAssigner("../../data/datasetSplit.txt")
+    dataset = Dataset("../../data/datasetSentences.txt", sc)
+
+    train_corpus = dataset.train_corpus
+    for sen in train_corpus[5000:5010]:
+        print (sen)

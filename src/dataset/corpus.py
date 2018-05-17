@@ -66,6 +66,9 @@ class Corpus():
         for sentence in self.corpus:
             yield sentence
 
+    def __getitem__(self, value):
+        return self.corpus[value]
+
 if __name__ == "__main__":
     from src.dataset.wordiddictionary import WordIdDictionary
 
