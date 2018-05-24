@@ -40,7 +40,7 @@ class Corpus():
 
     def get_word_context(self, sen_num, word_num, context_size):
         sentence = self.corpus[sen_num]
-        context = set()
+        context = set() #TODO might want to change this to an array. [Check results of both?]
 
         for i in range(1, context_size + 1):
             right_side = word_num + i

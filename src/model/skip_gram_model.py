@@ -99,6 +99,19 @@ class SkipGramModel(object):
 
         return softmax
 
+    def update_parameters(self, target_gradients, context_gradients):
+        self.target_vectors += target_gradients
+        self.context_vectors += context_gradients
+
+    def get_context_vector(self, context):
+        return self.context_vectors[context]
+
+    def get_target_vector(self, target):
+        return self.target_vectors[target]
+
+    def get_latent_space_size(self):
+        return len(self.target_vectors[0])
+
 
 class UniGram(object):
     def __init__(self, corpus):
