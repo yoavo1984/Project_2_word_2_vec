@@ -2,7 +2,7 @@
 import numpy as np
 
 # Test imports
-from src.model.hyperparamters import Hyperparameters
+from src.model.model_hyperparameters import Hyperparameters
 from src.dataset import dataset
 
 
