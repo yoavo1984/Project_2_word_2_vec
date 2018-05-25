@@ -87,8 +87,14 @@ class Dataset(object):
         pattern = re.compile(r'([^\s\w]|_)+')
         line = re.sub(pattern, '', line)
 
-        # Generating list of words and removing words shorter than 3
-        words = [x for x in line.split() if len(x) > 2]
+        # Generating list of words
+        words = [x for x in line.split()]
+
+        # Removing first word as it is just the index of the sentence
+        words = words[1:]
+
+        # Remove words smaller then 2
+        words = [x for x in words if len(x) > 2]
 
         return words
 
