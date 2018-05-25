@@ -25,6 +25,9 @@ class SkipGramModel(object):
         # Normalize each vector (L2 Norm).
         self.normalize_vectors()
 
+        # Save the context size
+        self.context_size = hyperparameters.context_size
+
     def normalize_vectors(self):
         """
         Normalize all the model vectors(target and context) to have a norm of 1.
@@ -115,6 +118,10 @@ class SkipGramModel(object):
 
     def get_latent_space_size(self):
         return len(self.target_vectors[0])
+
+    def get_matrix_size(self):
+        # TODO rename?
+        return self.target_vectors.shape
 
 
 class UniGram(object):

@@ -2,7 +2,7 @@
 import numpy as np
 
 
-NUMITER = 20000
+NUMITER = 500
 DECAY_RATE = 0.5
 
 class GradientDescent():
@@ -12,14 +12,15 @@ class GradientDescent():
         self.decay_rate = hyperparameters.decay_iteration_num
 
     def learnParamsUsingSGD(self, model, training_corpus):
+        print("- - Learning started.")
         for i in range(0, NUMITER):
             # Set gradients delta to zero.
-            gradients_target = np.zeros(model.get_latent_space_size())
-            gradients_context = np.zeros(model.get_latent_space_size())
+            gradients_target = np.zeros((model.get_matrix_size()))
+            gradients_context = np.zeros((model.get_matrix_size()))
 
             for j in (0, self.batch_size):
                 # Sample word context pair from dataset
-                target_word, context_words = training_corpus.sample_target_and_context()
+                target_word, context_words = training_corpus.sample_target_and_context(model.context_size)
 
                 # Iterate over all context words
                 for context_w in context_words:
