@@ -3,11 +3,13 @@ import numpy as np
 
 
 NUMITER = 20000
-MINI_BATCH = 100
+DECAY_RATE = 0.5
 
 class GradientDescent():
     def __init__(self, hyperparameters):
-        pass
+        self.learning_rate = hyperparameters.learning_rate
+        self.batch_size = hyperparameters.batch_size
+        self.decay_rate = hyperparameters.decay_iteration_num
 
     def learnParamsUsingSGD(self, model, training_corpus):
         for i in range(0, NUMITER):
@@ -15,7 +17,7 @@ class GradientDescent():
             gradients_target = np.zeros(model.get_latent_space_size())
             gradients_context = np.zeros(model.get_latent_space_size())
 
-            for j in (0, MINI_BATCH):
+            for j in (0, self.batch_size):
                 # Sample word context pair from dataset
                 target_word, context_words = training_corpus.sample_target_and_context()
 
@@ -37,5 +39,13 @@ class GradientDescent():
                         gradients_target[target_word] -= (1 - context_target_softmax) * model.get_context_vector(
                             negative_w)
 
+            # Multiply the gradients by the learning rate
+            gradients_target *= self.learning_rate
+            gradients_context *= self.learning_rate
+
             # Update the model parameters according to the computed gradients
             model.update_parameters(gradients_target, gradients_context)
+
+            # Decrease the learning rate by the decay_rate
+            if i == self.decay_rate:
+                self.learning_rate /= DECAY_RATE

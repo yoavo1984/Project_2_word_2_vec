@@ -100,8 +100,12 @@ class SkipGramModel(object):
         return softmax
 
     def update_parameters(self, target_gradients, context_gradients):
+        # Add the gradients.
         self.target_vectors += target_gradients
         self.context_vectors += context_gradients
+
+        # Normalize the vectors.
+        self.normalize_vectors()
 
     def get_context_vector(self, context):
         return self.context_vectors[context]
