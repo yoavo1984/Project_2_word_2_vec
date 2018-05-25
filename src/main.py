@@ -19,7 +19,7 @@ def run_sgd():
 
     # Setting up learner.
     print("- Setting up learner.")
-    l_hyperparameters = LearningHyperparameters(0.5, 5, 100)
+    l_hyperparameters = LearningHyperparameters(0.25, 50, 100)
     learner = GradientDescent(l_hyperparameters)
     learner.learnParamsUsingSGD(sk_model, train_corpus)
 

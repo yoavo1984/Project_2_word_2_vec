@@ -62,6 +62,21 @@ class Corpus():
             for word in sentence:
                 yield word
 
+    def iterate_target_context(self, context_size):
+        """
+        
+        Args:
+            context_size: 
+
+        Returns:
+
+        """
+        for sentence_index, sentence in enumerate(self.corpus):
+            for word_index, word in enumerate(sentence):
+                context_words = self.get_word_context(sentence_index, word_index, context_size)
+                yield word, context_words
+
+
     def get_words_count(self):
         count = 0
         for _ in self.iterate_words():
