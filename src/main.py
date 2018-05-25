@@ -5,12 +5,31 @@ from src.learning.learning_hyperparameters import LearningHyperparameters
 from src.model.model_hyperparameters import Hyperparameters
 from src.model.skip_gram_model import SkipGramModel
 
+def hyper_parameters_by_configuration():
+    with open('configuration') as config:
+        lines = config.readlines()
+
+        # Remove comments
+        lines = [x for x in lines if x[0] != "#"]
+
+        for line in lines:
+            parameters = line.split(":")
+            hyperparameters = *parameters[1:],
+
+            if parameters[0] == "model":
+                model_hyperparameters = Hyperparameters(hyperparameters, "123")
+
+            if parameters[0] == "learning":
+                learning_hyperparameters = LearningHyperparameters(hyperparameters)
+
+        return model_hyperparameters, learning_hyperparameters
 
 def run_sgd():
     print("- Setting up dataset")
     sc = SentenceAssigner("../data/datasetSplit.txt")
     dataset = Dataset("../data/datasetSentences.txt", sc)
     train_corpus = dataset.train_corpus
+    test_corpus = dataset.test_corpus
 
     # Setting up model.
     print("- Setting up model")
@@ -21,7 +40,7 @@ def run_sgd():
     print("- Setting up learner.")
     l_hyperparameters = LearningHyperparameters(0.25, 50, 100)
     learner = GradientDescent(l_hyperparameters)
-    learner.learnParamsUsingSGD(sk_model, train_corpus)
+    learner.learnParamsUsingSGD(sk_model, train_corpus, test_corpus)
 
 if __name__ == "__main__":
     run_sgd()
