@@ -1,4 +1,5 @@
 import sys
+import time
 
 from src.dataset.dataset import Dataset
 from src.dataset.sentence_assignments import SentenceAssigner
@@ -51,6 +52,39 @@ def run_sgd():
     l_hyperparameters = LearningHyperparameters(0.25, 50, 100)
     learner = GradientDescent(l_hyperparameters)
     learner.learnParamsUsingSGD(sk_model, train_corpus, test_corpus)
+
+
+def get_train_and_test():
+    # Read the data and split into train and test.
+    sc = SentenceAssigner("../data/datasetSplit.txt")
+    dataset = Dataset("../data/datasetSentences.txt", sc)
+
+    train_corpus = dataset.train_corpus
+    test_corpus = dataset.test_corpus
+
+    return train_corpus, test_corpus
+
+
+def main():
+    # Read the data and split into train and test.
+    train_corpus, test_corpus = get_train_and_test()
+
+    # Set hyperparameters based on configuration file.
+    m_hyperparameters, l_hyperparameters = hyper_parameters_by_configuration()
+
+    # Learn model and start the timer
+    start = time.time()
+
+    sk_model = SkipGramModel(m_hyperparameters, train_corpus)
+    learner = GradientDescent(l_hyperparameters)
+    learner.learnParamsUsingSGD(sk_model, train_corpus, test_corpus)
+
+    # Output hyperparameters and log-likelihoods to file.
+    with open("output", "w") as output:
+        # TODO add releveant attributes.
+        output.write("hyperparameters")
+        output.write("log likelihood")
+        output.write("Learning Time : {}".format(time.time() - start))
 
 if __name__ == "__main__":
     run_sgd()
