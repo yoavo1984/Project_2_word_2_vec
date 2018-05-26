@@ -78,11 +78,11 @@ class SkipGramModel(object):
             The log probablity of the given Target word given the context word and K
             negative sampled words
         """
-        context_target_softmax = self.compute_softmax(word_i, word_j)
-        sum = np.log(context_target_softmax)
+        context_target_sigmoid = self.compute_sigmoid(word_i, word_j)
+        sum = np.log(context_target_sigmoid)
 
         for word in words_k:
-            sum += np.log(1 - self.compute_softmax(word, word_j))
+            sum += np.log(1 - self.compute_sigmoid(word, word_j))
 
         return sum
 
@@ -101,6 +101,10 @@ class SkipGramModel(object):
         softmax = (target_context_dot_prod / target_all_sum)
 
         return softmax
+
+    def compute_sigmoid(self, context, target):
+        return 1  / (1 + -1 * np.exp (np.dot(self.context_vectors[context],
+                                             self.target_vectors[target])) )
 
     def update_parameters(self, target_gradients, context_gradients):
         # Add the gradients.
@@ -122,6 +126,11 @@ class SkipGramModel(object):
     def get_matrix_size(self):
         # TODO rename?
         return self.target_vectors.shape
+
+    def save_model(self):
+        np.savetxt("model_target", self.target_vectors, delimiter=",")
+        np.savetxt("model_context", self.context_vectors, delimiter=",")
+
 
 
 class UniGram(object):

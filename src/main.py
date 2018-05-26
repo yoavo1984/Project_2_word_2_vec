@@ -53,6 +53,9 @@ def run_sgd():
     learner = GradientDescent(l_hyperparameters)
     learner.learnParamsUsingSGD(sk_model, train_corpus, test_corpus)
 
+    print("- Finished learning")
+    sk_model.save_model()
+
 
 def get_train_and_test():
     # Read the data and split into train and test.
@@ -81,7 +84,7 @@ def main():
 
     # Output hyperparameters and log-likelihoods to file.
     with open("output", "w") as output:
-        # TODO add releveant attributes.
+        # TODO add relevant attributes.
         output.write("hyperparameters")
         output.write("log likelihood")
         output.write("Learning Time : {}".format(time.time() - start))

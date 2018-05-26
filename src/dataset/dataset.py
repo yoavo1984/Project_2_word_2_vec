@@ -48,7 +48,8 @@ class Dataset(object):
 
             for line in file:
                 words = self.preprocess(line)
-                sentences.append(words)
+                if len(words) > 0:
+                    sentences.append(words)
 
         return sentences
 
