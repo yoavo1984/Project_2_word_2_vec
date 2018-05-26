@@ -1,3 +1,5 @@
+import sys
+
 from src.dataset.dataset import Dataset
 from src.dataset.sentence_assignments import SentenceAssigner
 from src.learning.gradient_descent import GradientDescent
@@ -7,20 +9,25 @@ from src.model.skip_gram_model import SkipGramModel
 
 def hyper_parameters_by_configuration():
     with open('configuration') as config:
-        lines = config.readlines()
+        lines = config.read().splitlines()
+        # lines = config.readlines()
+        # lines = [line[:-1] for line in lines]
 
-        # Remove comments
-        lines = [x for x in lines if x[0] != "#"]
+        # Remove comments and empty lines.
+        lines = [x for x in lines if len(x) > 0 and x[0] != "#"]
 
         for line in lines:
             parameters = line.split(":")
-            hyperparameters = *parameters[1:],
+            hyperparameters = parameters[1:]
 
             if parameters[0] == "model":
-                model_hyperparameters = Hyperparameters(hyperparameters, "123")
+                model_hyperparameters = Hyperparameters(*hyperparameters)
 
             if parameters[0] == "learning":
-                learning_hyperparameters = LearningHyperparameters(hyperparameters)
+                learning_hyperparameters = LearningHyperparameters(*hyperparameters)
+
+        if model_hyperparameters is None or learning_hyperparameters is None:
+            sys.exit("Problem with configuration file.")
 
         return model_hyperparameters, learning_hyperparameters
 
@@ -30,6 +37,9 @@ def run_sgd():
     dataset = Dataset("../data/datasetSentences.txt", sc)
     train_corpus = dataset.train_corpus
     test_corpus = dataset.test_corpus
+
+    # Get hyperparameters from configuration file
+    m_hyperparameter, l_hyperparameters = hyper_parameters_by_configuration()
 
     # Setting up model.
     print("- Setting up model")

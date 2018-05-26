@@ -10,8 +10,8 @@ class Hyperparameters(object):
             noise_d(object): Choice of noise distribution.
             seed(int): Random seed for governing randomness.
         """
-        self.context_size = context_size
-        self.d = d
-        self.k = k
-        self.noise_d = noise_d
-        self.seed = seed
+        self.context_size = int(context_size)
+        self.d = int(d)
+        self.k = int(k)
+        self.noise_d = float(noise_d)
+        self.seed = int(seed)
