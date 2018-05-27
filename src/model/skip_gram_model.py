@@ -9,6 +9,7 @@ from src.dataset import dataset
 class SkipGramModel(object):
     def __init__(self, hyperparameters, training_corpus):
         self.corpus = training_corpus
+        self.word_dictionary = training_corpus.word_dictionary
 
         # Building the noise distribution.
         self.unigram = UniGram(training_corpus)
@@ -18,9 +19,9 @@ class SkipGramModel(object):
 
         # Create a vector for each word in the training data (u_i, v_i), and Sample each vector from a
         # multivariate Gaussian
-        number_of_words = training_corpus.get_words_count()
-        self.target_vectors = np.random.normal(0, 0.01, size=(number_of_words, hyperparameters.d))
-        self.context_vectors = np.random.normal(0, 0.01, size=(number_of_words, hyperparameters.d))
+        number_of_words = training_corpus.get_unique_words_count()
+        self.target_vectors = np.random.normal(0, 1, size=(number_of_words, hyperparameters.d))
+        self.context_vectors = np.random.normal(0, 1, size=(number_of_words, hyperparameters.d))
 
         # Normalize each vector (L2 Norm).
         self.normalize_vectors()
@@ -103,7 +104,7 @@ class SkipGramModel(object):
         return softmax
 
     def compute_sigmoid(self, context, target):
-        return 1  / (1 + -1 * np.exp (np.dot(self.context_vectors[context],
+        return 1  / (1 +  np.exp (-1 * np.dot(self.context_vectors[context],
                                              self.target_vectors[target])) )
 
     def update_parameters(self, target_gradients, context_gradients):
@@ -130,6 +131,25 @@ class SkipGramModel(object):
     def save_model(self):
         np.savetxt("model_target", self.target_vectors, delimiter=",")
         np.savetxt("model_context", self.context_vectors, delimiter=",")
+
+    def load_model(self):
+        self.context_vectors = np.loadtxt("model_context", delimiter=",")
+        self.target_vectors  = np.loadtxt("model_target", delimiter=",")
+
+    def find_closest_vector(self, to_vector):
+        multiplication = np.matmul(self.target_vectors, to_vector.T)
+        max_word = np.argpartition(multiplication, -10)[-10:]
+
+
+        # Return the relevant word
+        return max_word
+
+    def get_word_by_index(self, index):
+        return self.word_dictionary.get_word_by_id(index)
+
+    def get_index_by_word(self, word):
+        return self.word_dictionary.get_id_by_word(word)
+
 
 
 
