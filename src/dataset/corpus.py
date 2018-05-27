@@ -12,6 +12,7 @@ class Corpus():
     def __init__(self, sentence_array, dictionary):
 
         self.corpus = []
+        self.word_dictionary = dictionary
 
         for index, sentence in enumerate(sentence_array):
             self.corpus.append([])
@@ -83,6 +84,12 @@ class Corpus():
             count += 1
 
         return count
+
+    def get_unique_words_count(self):
+        return self.word_dictionary.get_dictionary_length()
+
+    def get_word_by_index(self, index):
+        return self.word_dictionary[index]
 
 
     def __iter__(self):
