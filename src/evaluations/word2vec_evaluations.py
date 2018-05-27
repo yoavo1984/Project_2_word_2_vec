@@ -1,3 +1,5 @@
+import numpy as np
+
 def predict_most_likely_context(model, input, num=1):
     """
     Predict the most likely context word with respect to the given model and the given input
@@ -51,4 +53,20 @@ def analogy_solver(model, a, b, c):
     Returns:
         A word d for which argmax d for which d(a - b + c) is maximal.
     """
+
+    #TODO Might be nice to hide the values inside the model class
+    a_vector = model.get_target_vector(model.get_index_by_word(a))
+    b_vector = model.get_target_vector(model.get_index_by_word(b))
+    c_vector = model.get_target_vector(model.get_index_by_word(c))
+
+    find = a_vector - b_vector + c_vector
+    # find_norm = np.linalg.norm(find)
+    # find = find / find_norm
+
+    answers_index = model.find_closest_vector(find)
+    for index in answers_index:
+        answer = model.get_word_by_index(index)
+        print("Answer is {}".format(answer))
+
+
     pass
