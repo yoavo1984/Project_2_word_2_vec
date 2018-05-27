@@ -76,6 +76,9 @@ class Dataset(object):
                 # Add all words to our set.
                 self.corpus.update(words)
 
+    def get_dictionary(self):
+        return self.dictionary
+
     @staticmethod
     def preprocess(line):
         # Lowercase
