@@ -47,6 +47,8 @@ class WordIdDictionary():
         else:
             return -1
 
+    def get_dictionary_length(self):
+        return len(self.twoWayDict)
 
 class TwoWayDict(dict):
     """
