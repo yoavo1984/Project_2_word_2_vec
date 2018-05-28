@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def predict_most_likely_context(model, input, num=1):
     """
@@ -24,6 +25,7 @@ def predict_most_likely_input(model, context_list, num=1):
     Returns:
         num most likely context words according to the model for the given context list.
     """
+    
     pass
 
 def scatter_input_in_2D(model , input_list):
@@ -37,7 +39,23 @@ def scatter_input_in_2D(model , input_list):
     Returns:
         No return value, creates a 2d pyplot scatter plot.
     """
-    pass
+    to_plot_x = []
+    to_plot_y = []
+
+    for word in input_list:
+        target_vector = model.get_target_vector(word)
+        to_plot_x.append(target_vector[0])
+        to_plot_y.append(target_vector[1])
+
+    fig, ax = plt.subplots()
+    ax.scatter(to_plot_x, to_plot_y)
+
+    for i, word in enumerate(input_list):
+        ax.annotate(word, (to_plot_x[i], to_plot_y[i]))
+
+    plt.title("Word Embedding Visualization")
+    # plt.scatter(to_plot_x, to_plot_y)
+    plt.show()
 
 def analogy_solver(model, a, b, c):
     """
@@ -55,9 +73,9 @@ def analogy_solver(model, a, b, c):
     """
 
     #TODO Might be nice to hide the values inside the model class
-    a_vector = model.get_target_vector(model.get_index_by_word(a))
-    b_vector = model.get_target_vector(model.get_index_by_word(b))
-    c_vector = model.get_target_vector(model.get_index_by_word(c))
+    a_vector = model.get_target_vector(a)
+    b_vector = model.get_target_vector(b)
+    c_vector = model.get_target_vector(c)
 
     find = a_vector - b_vector + c_vector
     # find_norm = np.linalg.norm(find)
