@@ -84,8 +84,49 @@ def deliverable_two(model):
 
 
 def deliverable_three(model):
-    print("three")
-    pass
+    """
+    Plot both training time and train and test (mean) log likelihood as a function of d.
+    * Two separate plots.
+    Args:
+        model: 
+
+    Returns:
+
+    """
+    d3_data = pickle.load(open("d3_test", "rb"))
+
+    # Plot training time vs d
+    time_data = d3_data["time"]
+    hyperparameters = time_data["hyper"]
+    running_time = time_data["running_time"]
+    batch_size = time_data["batch_size"]
+
+    plt.xlabel("Batch Size")
+    plt.ylabel("Running Time")
+
+    plt.title(hyperparameters)
+    plt.plot(batch_size, running_time)
+
+    plt.show()
+    plt.clf()
+
+    # Plot mean log-likelihood vs d
+    likelihood_data = d3_data["likelihood"]
+    hyperparameters = likelihood_data["hyper"]
+    train = likelihood_data["train"]
+    test = likelihood_data["test"]
+    batch_size = likelihood_data["batch_size"]
+
+    plt.xlabel("Batch Size")
+    plt.ylabel("Mean Log-Likelihood")
+
+    plt.title(hyperparameters)
+    plt.plot(batch_size, train)
+    plt.plot(batch_size, test)
+    plt.legend(["Train Log-Likelihood", "Test Log-Likelihood"])
+
+    plt.show()
+    plt.clf()
 
 def deliverable_four(model):
     given_words = ["good", "bad", "lame", "cool", "exciting"]
@@ -117,16 +158,16 @@ def test_pickle(save=True):
             "time" : {
                 "hyper" : "This are the set of parameters",
                 "running_time":[50, 52, 59, 60, 61],
-                "d" : [10, 80, 160 , 240, 300]
+                "batch_size" : [10, 20, 50 , 75, 100]
             },
             "likelihood" : {
                 "hyper": "This are the set of parameters",
                 "train": [1, 2, 3, 4, 5],
                 "test": [0.9, 0.8, 0.7, 0.6, 0.5],
-                "d": [10, 80, 160 , 240, 300]
+                "batch_size": [10, 20, 50 , 75, 100]
             }
         }
-        pickle.dump(data, open("d2_test", "wb"))
+        pickle.dump(data, open("d3_test", "wb"))
     else:
         print("Pickle Loading")
         arr = pickle.load(open("pickle_test", "rb"))
@@ -145,4 +186,4 @@ def run_deliverables(model, specific = -1):
 
 if __name__ == "__main__":
     test_pickle()
-    deliverable_two("a")
+    deliverable_three("a")
