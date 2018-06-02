@@ -42,7 +42,7 @@ class SkipGramModel(object):
         self.context_vectors = self.context_vectors / context_norms
 
 
-    def sample_word(self, alpha=1):
+    def sample_word(self, alpha=1, k=0):
         """
         Sample words from the vocabulary using a unigram to the alpha distribution.
         Args:
@@ -51,7 +51,7 @@ class SkipGramModel(object):
         Returns:
             A word sampled using the unigram to power alpha distribution
         """
-        return self.unigram.sample_word()
+        return self.unigram.sample_word(k=k)
 
     def sample_k_words(self):
         """
@@ -60,9 +60,7 @@ class SkipGramModel(object):
         Returns:
             (list) k words sampled from the hyperparameters noise distribution
         """
-        samples = []
-        for i in range (self.k):
-            samples.append(self.sample_word())
+        samples = self.sample_word(k=self.k)
 
         return samples
 
@@ -81,9 +79,11 @@ class SkipGramModel(object):
         """
         context_target_sigmoid = self.compute_sigmoid(word_i, word_j)
         sum = np.log(context_target_sigmoid)
+        k = len(words_k)
 
+        test = 0
         for word in words_k:
-            sum += np.log(1 - self.compute_sigmoid(word, word_j))
+            sum += (1/k) * np.log(1 - self.compute_sigmoid(word, word_j))
 
         return sum
 
@@ -116,9 +116,14 @@ class SkipGramModel(object):
         self.normalize_vectors()
 
     def get_context_vector(self, context):
+        if isinstance(context, str):
+            context = self.get_index_by_word(context)
         return self.context_vectors[context]
 
     def get_target_vector(self, target):
+        if isinstance(target, str):
+            target = self.get_index_by_word(target)
+
         return self.target_vectors[target]
 
     def get_latent_space_size(self):
@@ -136,13 +141,16 @@ class SkipGramModel(object):
         self.context_vectors = np.loadtxt("model_context", delimiter=",")
         self.target_vectors  = np.loadtxt("model_target", delimiter=",")
 
-    def find_closest_vector(self, to_vector):
-        multiplication = np.matmul(self.target_vectors, to_vector.T)
-        max_word = np.argpartition(multiplication, -10)[-10:]
+    def find_most_similar_vector(self, to_vector, context=False):
+        if context:
+            multiplication = np.matmul(self.context_vectors, to_vector.T)
+        else:
+            multiplication = np.matmul(self.target_vectors, to_vector.T)
 
+        max_words = np.argpartition(multiplication, -10)[-10:]
 
         # Return the relevant word
-        return max_word
+        return max_words
 
     def get_word_by_index(self, index):
         return self.word_dictionary.get_word_by_id(index)
@@ -165,6 +173,8 @@ class UniGram(object):
 
         self.generate_unigram_distribution()
 
+        self.sample_bank = []
+
     def generate_unigram_distribution(self):
         """
         Generates the unigram distribution, counts number of occurrences for each words and
@@ -183,16 +193,31 @@ class UniGram(object):
     def reset_probabilites(self):
         self.generate_unigram_distribution()
 
-    def sample_word(self):
+    def sample_word(self, k):
         """
         Returns a random word from the corpus using a unigram distribution.
         Returns:
             (str) : The sampled word.
         """
+        if k==0:
+            return []
+
+        if len(self.sample_bank) < k:
+            self.refill_sample_bank()
+
+        samples = self.sample_bank[:k]
+        self.sample_bank = self.sample_bank[k:]
+
+        return samples
+
+    def refill_sample_bank(self):
         words = list(self.distribution.keys())
         p = list(self.distribution.values())
 
-        return np.random.choice(words, p=p)
+        new_samples = np.random.choice(words, p=p, size=1000, replace=True)
+
+        self.sample_bank.extend(new_samples)
+
 
     def set_alpha(self, alpha):
         self.reset_probabilites()
