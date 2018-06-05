@@ -36,6 +36,7 @@ def deliverable_one(model):
 
     plt.clf()
 
+
 def deliverable_two(model):
     """
     Plot both training time and train and test (mean) log likelihood as a function of d.
@@ -47,11 +48,11 @@ def deliverable_two(model):
 
     """
 
-    d2_data = pickle.load(open("d2_test", "rb"))
+    d2_data = pickle.load(open("d2", "rb"))
 
     # Plot training time vs d
     time_data = d2_data["time"]
-    hyperparameters = time_data["hyper"]
+    hyperparameters = "hyper"
     running_time = time_data["running_time"]
     d = time_data["d"]
 
@@ -66,7 +67,7 @@ def deliverable_two(model):
 
     # Plot mean log-likelihood vs d
     likelihood_data = d2_data["likelihood"]
-    hyperparameters = likelihood_data["hyper"]
+    hyperparameters = "hyper"
     train = likelihood_data["train"]
     test = likelihood_data["test"]
     d = likelihood_data["d"]
@@ -130,7 +131,12 @@ def deliverable_three(model):
 
 def deliverable_four(model):
     given_words = ["good", "bad", "lame", "cool", "exciting"]
-    pass
+    for word in given_words:
+        # Find 10 most likely contexts
+        matching_contexts = predict_most_likely_context(model, word, 10)
+
+        #
+        pass
 
 def deliverable_five(model):
     sentence_one = ["the", "movie", "was", "surprisingly", ""]
@@ -186,4 +192,4 @@ def run_deliverables(model, specific = -1):
 
 if __name__ == "__main__":
     test_pickle()
-    deliverable_three("a")
+    deliverable_two("a")

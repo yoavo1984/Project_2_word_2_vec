@@ -1,5 +1,6 @@
 # Standard Libraries
 import numpy as np
+import pickle
 
 # Test imports
 from src.model.model_hyperparameters import Hyperparameters
@@ -214,10 +215,9 @@ class UniGram(object):
         words = list(self.distribution.keys())
         p = list(self.distribution.values())
 
-        new_samples = np.random.choice(words, p=p, size=1000, replace=True)
+        new_samples = np.random.choice(words, p=p, size=100000, replace=True)
 
         self.sample_bank.extend(new_samples)
-
 
     def set_alpha(self, alpha):
         self.reset_probabilites()

@@ -2,9 +2,11 @@
 import numpy as np
 import time
 import sys
+import pickle
 
 NUMITER = 20000
 DECAY_RATE = 0.5
+
 
 class GradientDescent():
     def __init__(self, hyperparameters):
@@ -15,8 +17,6 @@ class GradientDescent():
 
     def create_mini_batch(self, model, training_corpus):
         batch = []
-
-
         for i in range(self.batch_size):
             target_word, context_words = training_corpus.sample_target_and_context(model.context_size)
 
@@ -28,7 +28,7 @@ class GradientDescent():
     def learnParamsUsingSGD(self, model, training_corpus, test_corpus=False):
         print("- - Learning started.")
         np.random.seed(123)
-
+        deliverable_data = _create_deliverable_object()
         for i in range(0, NUMITER):
             # Set gradients delta to zero.
             gradients_target = np.zeros((model.get_matrix_size()))
@@ -36,8 +36,6 @@ class GradientDescent():
 
             start = time.time()
             batch = self.create_mini_batch(model, training_corpus)
-            # print ("- = Before")
-            # self.compute_sample_likelihood(model, training_corpus, batch)
             for sample in batch:
                 target_word, context_w, negative_words = *sample,
 
@@ -65,40 +63,31 @@ class GradientDescent():
             if (i+1) % self.decay_rate == 0:
                 self.learning_rate /= DECAY_RATE
 
-            # if test_corpus and i % self.print_likelihood_iterations == 0:
-                # likelihood_start = time.time()
-                # test_likelihood = self.compute_model_likelihood(model, test_corpus)
-                # print("Likelihood time = {}".format(likelihood_start))
-
-            # print("- = After")
-            # sample_likelihood = self.compute_sample_likelihood(model, training_corpus, batch, i)
-
-            if i%25 == 0:
+            if i % self.print_likelihood_iterations == 0:
                 model.save_model()
-                print(" -|Model Saved!")
-                sample_likelihood = self.compute_sample_likelihood(model, training_corpus, batch, i)
+                print(" -|Model Saved! iteration : {}".format(i))
+                # sample_likelihood = self.compute_sample_likelihood(model, training_corpus, batch, i)
+                # test_likelihood = self.compute_model_likelihood(model, training_corpus)
+                # update_deliverable(deliverable_data, sample_likelihood, test_likelihood, i)
 
-            # self.compute_model_likelihood(model, test_corpus)
-
-            # print("(/) batch time is {}".format(time.time() - start))
+        # Learning over
+        pickle.dump(deliverable_data, open("d1", "wb"))
 
     def compute_model_likelihood(self, model, corpus):
         sum = 0
         num_of_pairs = 0
         for pair in corpus.iterate_target_context(model.context_size):
-            num_of_pairs += 1
+
             target = pair[0]
             contexts = pair[1]
 
             negative = model.sample_k_words()
-
-            #
             for context in contexts:
+                num_of_pairs += 1
                 sum += model.compute_log_probability(context, target, negative)
 
-        print ("- - likelihood = {}".format(sum))
+        print("- - likelihood = {}".format(sum / num_of_pairs))
         return sum/num_of_pairs
-
 
     def compute_sample_likelihood(self, model, corpus, batch, round):
         sum = 0
@@ -108,4 +97,19 @@ class GradientDescent():
             sum += model.compute_log_probability(context_w, target_word, negative_words)
 
         print("- | Sample likelihood = {}".format(sum / len(batch)))
-        return sum
+        return sum / len(batch)
+
+
+def _create_deliverable_object():
+    data = {}
+    data["iterations"] = []
+    data["train"] = []
+    data["test"] = []
+    data["hyper"] = []
+    return data
+
+
+def update_deliverable(data_object, train_likelihood, test_likelihood, iteration):
+    data_object["iterations"].append(iteration)
+    data_object["train"].append(train_likelihood)
+    data_object["test"].append(test_likelihood)

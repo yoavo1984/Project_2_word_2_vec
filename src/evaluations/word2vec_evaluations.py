@@ -1,18 +1,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+C = 3
+
 def predict_most_likely_context(model, input, num=1):
     """
     Predict the most likely context word with respect to the given model and the given input
     Args:
         model: The model to use to evaluate the probabilities of the possible context words.
-        input: The input we want to check against.
+        input: The input we want to check against(a target word).
         num: The number of input words the method should return.
         
     Returns:
         num most likely input words according to the model for the given input.
     """
-    pass
+    target_vector = model.get_target_vector(input)
+    answers_index = model.find_most_similar_vector(target_vector, True)
+    for index in answers_index:
+        answer = model.get_word_by_index(index)
+        print("Answer is {}".format(answer))
+
 
 def predict_most_likely_input(model, context_list, num=1):
     """
@@ -20,12 +27,29 @@ def predict_most_likely_input(model, context_list, num=1):
     Args:
         model: The model to use to evaluate the probabilities of the possible input words. 
         context_list: The list we want to check against
-        num: The number of context words the method should return.
+        num: The number of input words the method should return.
         
     Returns:
         num most likely context words according to the model for the given context list.
     """
-    
+    middle = int(len(context_list)/2)
+    start = max(middle-C, 0)
+    end = min(middle+C, len(context_list)-1)
+
+    # Retrieve the contexts ids for interacting with the model
+    contexts = context_list[start:end]
+    contexts_id = list ( map(model.get_index_by_word, contexts))
+
+    # Get context and target vectors from the model.
+    context_matrix = model.context_vectors
+    target_matrix = model.target_vectors
+
+    # Pull relevant contexts
+    relevant_context = context_matrix[contexts_id]
+
+
+
+
     pass
 
 def scatter_input_in_2D(model , input_list):
@@ -72,19 +96,16 @@ def analogy_solver(model, a, b, c):
         A word d for which argmax d for which d(a - b + c) is maximal.
     """
 
-    #TODO Might be nice to hide the values inside the model class
     a_vector = model.get_target_vector(a)
     b_vector = model.get_target_vector(b)
     c_vector = model.get_target_vector(c)
 
     find = a_vector - b_vector + c_vector
-    # find_norm = np.linalg.norm(find)
-    # find = find / find_norm
+    find_norm = np.linalg.norm(find)
+    find = find / find_norm
 
-    answers_index = model.find_closest_vector(find)
+    answers_index = model.find_most_similar_vector(find)
     for index in answers_index:
         answer = model.get_word_by_index(index)
         print("Answer is {}".format(answer))
 
-
-    pass

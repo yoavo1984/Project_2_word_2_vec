@@ -4,5 +4,5 @@ model:5:150:10:0:125
 
 
 # Learning parameters learning_rate:batch_size:decay_iteration_num:print_likelihood_iterations
-learning:1:50:10000:100
+learning:0.3:50:10000:500
 
