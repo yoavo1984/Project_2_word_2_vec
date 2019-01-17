@@ -1,13 +1,14 @@
 # Standard Libraries
 import numpy as np
-import pickle
-
-# Test imports
-from src.model.model_hyperparameters import Hyperparameters
-from src.dataset import dataset
 
 
 class SkipGramModel(object):
+    """
+    A class to represent a skip gram model.
+        Args:
+            hyperparameters: The hyperparameters of the model.
+            training_corpus: The training corpus which will use to create the unigram model.
+        """
     def __init__(self, hyperparameters, training_corpus):
         self.corpus = training_corpus
         self.word_dictionary = training_corpus.word_dictionary
@@ -20,9 +21,9 @@ class SkipGramModel(object):
 
         # Create a vector for each word in the training data (u_i, v_i), and Sample each vector from a
         # multivariate Gaussian
-        number_of_words = training_corpus.get_unique_words_count()
-        self.target_vectors = np.random.normal(0, 1, size=(number_of_words, hyperparameters.d))
-        self.context_vectors = np.random.normal(0, 1, size=(number_of_words, hyperparameters.d))
+        self.number_of_words = training_corpus.get_unique_words_count()
+        self.target_vectors = np.random.normal(0, 1, size=(self.number_of_words, hyperparameters.d))
+        self.context_vectors = np.random.normal(0, 1, size=(self.number_of_words, hyperparameters.d))
 
         # Normalize each vector (L2 Norm).
         self.normalize_vectors()
@@ -41,7 +42,6 @@ class SkipGramModel(object):
 
         context_norms = np.linalg.norm(self.context_vectors, axis=1, keepdims=True)
         self.context_vectors = self.context_vectors / context_norms
-
 
     def sample_word(self, alpha=1, k=0):
         """
@@ -65,26 +65,26 @@ class SkipGramModel(object):
 
         return samples
 
-    def compute_log_probability(self, word_i, word_j, words_k):
+    def compute_log_probability(self, context_word, input_word, negatives):
         """
         Computes the log probability of word_i given word_j and K negative sampled
         words.
         Args:
-            word_i: Context word. 
-            word_j: Given target word
-            words_k: K sampled negative context words
+            context_word: Context word. 
+            input_word: Given target word
+            negatives: K sampled negative context words
 
         Returns:
             The log probablity of the given Target word given the context word and K
             negative sampled words
         """
-        context_target_sigmoid = self.compute_sigmoid(word_i, word_j)
+        context_target_sigmoid = self.compute_sigmoid(context_word, input_word)
         sum = np.log(context_target_sigmoid)
-        k = len(words_k)
+        k = len(negatives)
 
         test = 0
-        for word in words_k:
-            sum += (1/k) * np.log(1 - self.compute_sigmoid(word, word_j))
+        for word in negatives:
+            sum += (1/k) * np.log(1 - self.compute_sigmoid(word, input_word))
 
         return sum
 
@@ -131,8 +131,10 @@ class SkipGramModel(object):
         return len(self.target_vectors[0])
 
     def get_matrix_size(self):
-        # TODO rename?
         return self.target_vectors.shape
+
+    def get_number_of_words(self):
+        return self.number_of_words
 
     def save_model(self):
         np.savetxt("model_target", self.target_vectors, delimiter=",")
@@ -159,7 +161,8 @@ class SkipGramModel(object):
     def get_index_by_word(self, word):
         return self.word_dictionary.get_id_by_word(word)
 
-
+    def iterate_words(self):
+        return self.corpus.iterate_words()
 
 
 class UniGram(object):
@@ -220,6 +223,12 @@ class UniGram(object):
         self.sample_bank.extend(new_samples)
 
     def set_alpha(self, alpha):
+        """
+        Set the alpha in the unigram model.
+        Args:
+            alpha: The alpha parameter of the unigram model.
+
+        """
         self.reset_probabilites()
         probabilities_sum = 0
 
@@ -230,18 +239,3 @@ class UniGram(object):
 
         for key,val in self.distribution.items():
             self.distribution[key] = val / probabilities_sum
-
-
-if __name__ == "__main__":
-    hyperparameters = Hyperparameters(2, 10, 5, 10, 1, 123)
-    np.random.seed(123)
-    dataset_class = dataset.get_dataset()
-    train_corpus = dataset_class.train_corpus
-
-    sk_model = SkipGramModel(hyperparameters, train_corpus)
-
-    for i in range(10):
-        k_words = sk_model.sample_k_words()
-        target, contexts = train_corpus.sample_target_and_context(3)
-
-        print(sk_model.compute_log_probability(contexts.pop(), target, k_words))

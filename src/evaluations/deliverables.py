@@ -16,7 +16,7 @@ def deliverable_one(model):
     Returns:
 
     """
-    d1_data = pickle.load(open("d1_test", "rb"))
+    d1_data = pickle.load(open("d1", "rb"))
 
     iterations = d1_data["iterations"]
     train_error = d1_data['train']
@@ -27,11 +27,11 @@ def deliverable_one(model):
     plt.xlabel("Iteration")
     plt.ylabel("Mean Log-Likelihood")
 
-    plt.title(hyper_string)
     plt.plot(iterations, train_error)
     plt.plot(iterations, test_error)
 
     plt.legend(["Train Log-Likelihood" ,"Test Log-Likelihood"])
+    plt.savefig("deliverable_1.png")
     plt.show()
 
     plt.clf()
@@ -59,10 +59,10 @@ def deliverable_two(model):
     plt.xlabel("d")
     plt.ylabel("Running Time")
 
-    plt.title(hyperparameters)
     plt.plot(d, running_time)
 
-    plt.show()
+    # plt.show()
+    plt.savefig("time_vs_d.png")
     plt.clf()
 
     # Plot mean log-likelihood vs d
@@ -75,12 +75,12 @@ def deliverable_two(model):
     plt.xlabel("d")
     plt.ylabel("Mean Log-Likelihood")
 
-    plt.title(hyperparameters)
     plt.plot(d, train)
     plt.plot(d, test)
     plt.legend(["Train Log-Likelihood", "Test Log-Likelihood"])
 
-    plt.show()
+    # plt.show()
+    plt.savefig("log_vs_d.png")
     plt.clf()
 
 
@@ -94,59 +94,74 @@ def deliverable_three(model):
     Returns:
 
     """
-    d3_data = pickle.load(open("d3_test", "rb"))
+    d3_data = pickle.load(open("pickle/d3", "rb"))
 
-    # Plot training time vs d
+    # Plot training time vs context
     time_data = d3_data["time"]
     hyperparameters = time_data["hyper"]
     running_time = time_data["running_time"]
-    batch_size = time_data["batch_size"]
+    context_size = time_data["context_size"]
 
-    plt.xlabel("Batch Size")
+    plt.xlabel("Context Size")
     plt.ylabel("Running Time")
 
-    plt.title(hyperparameters)
-    plt.plot(batch_size, running_time)
+    plt.plot(context_size, running_time)
 
-    plt.show()
+    # plt.show()
+    plt.savefig("training_time_vs_context.png")
     plt.clf()
 
-    # Plot mean log-likelihood vs d
+    # Plot mean log-likelihood vs context
     likelihood_data = d3_data["likelihood"]
     hyperparameters = likelihood_data["hyper"]
     train = likelihood_data["train"]
     test = likelihood_data["test"]
-    batch_size = likelihood_data["batch_size"]
+    context_size = likelihood_data["context_size"]
 
-    plt.xlabel("Batch Size")
+    plt.xlabel("Context Size")
     plt.ylabel("Mean Log-Likelihood")
 
-    plt.title(hyperparameters)
-    plt.plot(batch_size, train)
-    plt.plot(batch_size, test)
+    plt.plot(context_size, train)
+    plt.plot(context_size, test)
     plt.legend(["Train Log-Likelihood", "Test Log-Likelihood"])
 
-    plt.show()
+    # plt.show()
+    plt.savefig("likelihood_vs_context.png")
     plt.clf()
+
 
 def deliverable_four(model):
     given_words = ["good", "bad", "lame", "cool", "exciting"]
     for word in given_words:
         # Find 10 most likely contexts
+        print("Context for :{}".format(word))
         matching_contexts = predict_most_likely_context(model, word, 10)
 
-        #
-        pass
+    given_words.extend(["john", "alice", "computer", "learning", "machine"])
+    scatter_input_in_2d(model, given_words)
+    scatter_input_in_2d(model, given_words, False)
+
 
 def deliverable_five(model):
-    sentence_one = ["the", "movie", "was", "surprisingly", ""]
-    sentence_two = ["", "was", "really", "disappointing"]
-    sentence_three = ["Knowing", "that", "she", "", "was", "the", "best"]
-    print("five")
-    pass
+    print("The movie was surprisingly ______")
+    predict_most_likely_input(model, "the movie was surprisingly".split(), 4)
+    print("*"*50)
+    print("____ was really disappointing")
+    predict_most_likely_input(model, "was really disappointing".split(), 0)
+    print("*" * 50)
+    print("Knowing that she ____ was the best part")
+    predict_most_likely_input(model, "knowing that she was the best part".split(), 3)
+
 
 def deliverable_six(model):
-    print("six")
+    print("man is to woman as men is to ____")
+    analogy_solver(model, "man", "woman", "men")
+
+    print("good is to great as bad is to ____")
+    analogy_solver(model, "good", "great", "bad")
+
+    print("warm is to cold as summer is to ____")
+    analogy_solver(model, "warm", "cold", "summer")
     pass
 
 
@@ -157,32 +172,10 @@ DELIVERABLES = [deliverable_one,
                 deliverable_five,
                 deliverable_six]
 
-def test_pickle(save=True):
-    if save:
-        print("Pickle Saving")
-        data = {
-            "time" : {
-                "hyper" : "This are the set of parameters",
-                "running_time":[50, 52, 59, 60, 61],
-                "batch_size" : [10, 20, 50 , 75, 100]
-            },
-            "likelihood" : {
-                "hyper": "This are the set of parameters",
-                "train": [1, 2, 3, 4, 5],
-                "test": [0.9, 0.8, 0.7, 0.6, 0.5],
-                "batch_size": [10, 20, 50 , 75, 100]
-            }
-        }
-        pickle.dump(data, open("d3_test", "wb"))
-    else:
-        print("Pickle Loading")
-        arr = pickle.load(open("pickle_test", "rb"))
-        print(arr)
-
 
 def run_deliverables(model, specific = -1):
     if specific != -1:
-        DELIVERABLES[specific-1]()
+        DELIVERABLES[specific-1](model)
 
     else:
         for deliverable in DELIVERABLES:
@@ -191,5 +184,6 @@ def run_deliverables(model, specific = -1):
 
 
 if __name__ == "__main__":
-    test_pickle()
-    deliverable_two("a")
+    # deliverable_one("a")
+    # deliverable_two("a")
+    deliverable_one("a")

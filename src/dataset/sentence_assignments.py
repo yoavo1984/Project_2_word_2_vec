@@ -50,11 +50,9 @@ class SentenceAssigner():
 
                 self.assignments[index] = assignment
 
+
 def count_lines_in_file(fname):
     with open(fname) as f:
         for i, l in enumerate(f):
             pass
     return i + 1
-
-if __name__ == "__main__":
-    sc = SentenceAssigner("../../data/datasetSplit.txt")

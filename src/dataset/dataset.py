@@ -54,6 +54,9 @@ class Dataset(object):
         return sentences
 
     def set_test_train_sentences(self):
+        """
+        Assign each sentence to the appropriate train/test bucket.
+        """
         for index, sentence in enumerate(self.sentences):
             assignment = self.assigner.assign(index)
             if assignment == 1:
@@ -102,13 +105,9 @@ class Dataset(object):
 
         return words
 
+
 def get_dataset():
     sc = SentenceAssigner("../../data/datasetSplit.txt")
     dataset = Dataset("../../data/datasetSentences.txt", sc)
 
     return dataset
-if __name__ == "__main__":
-    sc = SentenceAssigner("../../data/datasetSplit.txt")
-    dataset = Dataset("../../data/datasetSentences.txt", sc)
-
-    train_corpus = dataset.train_corpus

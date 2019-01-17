@@ -1,8 +1,8 @@
 # Standard libraries
 import numpy as np
 import time
-import sys
 import pickle
+
 
 NUMITER = 20000
 DECAY_RATE = 0.5
@@ -27,7 +27,9 @@ class GradientDescent():
 
     def learnParamsUsingSGD(self, model, training_corpus, test_corpus=False):
         print("- - Learning started.")
+
         np.random.seed(123)
+
         deliverable_data = _create_deliverable_object()
         for i in range(0, NUMITER):
             # Set gradients delta to zero.
@@ -61,16 +63,19 @@ class GradientDescent():
 
             # Decrease the learning rate by the decay_rate
             if (i+1) % self.decay_rate == 0:
-                self.learning_rate /= DECAY_RATE
+                self.learning_rate *= DECAY_RATE
 
+            # Log the computed log likelihoods.
             if i % self.print_likelihood_iterations == 0:
                 model.save_model()
                 print(" -|Model Saved! iteration : {}".format(i))
-                # sample_likelihood = self.compute_sample_likelihood(model, training_corpus, batch, i)
-                # test_likelihood = self.compute_model_likelihood(model, training_corpus)
-                # update_deliverable(deliverable_data, sample_likelihood, test_likelihood, i)
+                sample_likelihood = self.compute_sample_likelihood(model, training_corpus, batch, i)
+                test_likelihood = self.compute_model_likelihood(model, training_corpus)
+                update_deliverable(deliverable_data, sample_likelihood, test_likelihood, i)
+                pickle.dump(deliverable_data, open("d1", "wb"))
 
         # Learning over
+        print("Saving pickle ")
         pickle.dump(deliverable_data, open("d1", "wb"))
 
     def compute_model_likelihood(self, model, corpus):

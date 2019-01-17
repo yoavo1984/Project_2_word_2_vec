@@ -50,6 +50,7 @@ class WordIdDictionary():
     def get_dictionary_length(self):
         return len(self.twoWayDict)
 
+
 class TwoWayDict(dict):
     """
     An implementation of a 2 way dictionary gives us an easy abstraction
@@ -72,18 +73,3 @@ class TwoWayDict(dict):
     def __len__(self):
         """Returns the number of connections"""
         return dict.__len__(self) // 2
-
-
-if __name__ == "__main__":
-    sentences = [["this", "is", "a", "sentence"], ["this", "is", "annother", "one"], ["this", "is", "the", "third", "one"]]
-    di = WordIdDictionary(sentences)
-
-    print(di.get_id_by_word('is'))
-    print(di.get_id_by_word('a'))
-    print(di.get_id_by_word('one'))
-    print(di.get_id_by_word('bbb'))
-    print("---")
-    print(di.get_word_by_id(1))
-    print(di.get_word_by_id(2))
-    print(di.get_word_by_id(5))
-    print(di.get_word_by_id(-1))

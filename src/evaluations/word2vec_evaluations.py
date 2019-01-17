@@ -18,41 +18,55 @@ def predict_most_likely_context(model, input, num=1):
     answers_index = model.find_most_similar_vector(target_vector, True)
     for index in answers_index:
         answer = model.get_word_by_index(index)
-        print("Answer is {}".format(answer))
+        print(answer)
 
 
-def predict_most_likely_input(model, context_list, num=1):
+def predict_most_likely_input(model, context_list, input_position, num=1):
     """
     Predicts the most likely input word with respect to the given model and the given context list.
     Args:
         model: The model to use to evaluate the probabilities of the possible input words. 
         context_list: The list we want to check against
+        input_position: The position of the input word.
         num: The number of input words the method should return.
         
     Returns:
         num most likely context words according to the model for the given context list.
     """
-    middle = int(len(context_list)/2)
-    start = max(middle-C, 0)
-    end = min(middle+C, len(context_list)-1)
 
-    # Retrieve the contexts ids for interacting with the model
-    contexts = context_list[start:end]
-    contexts_id = list ( map(model.get_index_by_word, contexts))
+    # Get context size from the model.
+    context_size = model.context_size
 
-    # Get context and target vectors from the model.
-    context_matrix = model.context_vectors
-    target_matrix = model.target_vectors
+    # Pull context words from the given context_list
+    contexts = []
+    for i in range(context_size):
+        if i == 0:
+            if input_position < len(context_list):
+                contexts.append(context_list[input_position])
+        else:
+            if input_position - i >= 0:
+                contexts.append(context_list[input_position - i])
+            if input_position + i < (len(context_list) - 1):
+                contexts.append(context_list[input_position + i])
 
-    # Pull relevant contexts
-    relevant_context = context_matrix[contexts_id]
+    # Compute likelihood for each
+    num_of_words = model.get_number_of_words()
+    words_scores = np.zeros(num_of_words)
+    for word in range(num_of_words):
+        word_score = 0
+        for context in contexts:
+            negatives = model.sample_k_words()
+            context_id = model.get_index_by_word(context)
+            word_score += model.compute_log_probability(context_id, word, negatives)
+
+        words_scores[word] = word_score
+
+    best_inputs_indexes = np.argpartition(words_scores, -10)[-10:]
+    for word_index in best_inputs_indexes:
+        print(model.get_word_by_index(word_index))
 
 
-
-
-    pass
-
-def scatter_input_in_2D(model , input_list):
+def scatter_input_in_2d(model , input_list, target=True):
     """
     Given a model and a list of input words creates a 2d scatter plot of the given words
     using the first 2 elements in each input list target vector.
@@ -66,20 +80,30 @@ def scatter_input_in_2D(model , input_list):
     to_plot_x = []
     to_plot_y = []
 
+    # Pull all the words vector from the model.
     for word in input_list:
-        target_vector = model.get_target_vector(word)
-        to_plot_x.append(target_vector[0])
-        to_plot_y.append(target_vector[1])
+        if target:
+            target_vector = model.get_target_vector(word)
+            to_plot_x.append(target_vector[0])
+            to_plot_y.append(target_vector[1])
+        else:
+            context_vector = model.get_context_vector(word)
+            to_plot_x.append(context_vector[0])
+            to_plot_y.append(context_vector[1])
 
+    # Create the scatter plot.
     fig, ax = plt.subplots()
     ax.scatter(to_plot_x, to_plot_y)
 
+    # Annotate each word in the plot.
     for i, word in enumerate(input_list):
         ax.annotate(word, (to_plot_x[i], to_plot_y[i]))
 
     plt.title("Word Embedding Visualization")
     # plt.scatter(to_plot_x, to_plot_y)
     plt.show()
+    plt.savefig("scatter_plot")
+
 
 def analogy_solver(model, a, b, c):
     """
@@ -96,16 +120,19 @@ def analogy_solver(model, a, b, c):
         A word d for which argmax d for which d(a - b + c) is maximal.
     """
 
+    # Get vectors from model.
     a_vector = model.get_target_vector(a)
     b_vector = model.get_target_vector(b)
     c_vector = model.get_target_vector(c)
 
+    # Do the vector math (a - b + c)
     find = a_vector - b_vector + c_vector
     find_norm = np.linalg.norm(find)
     find = find / find_norm
 
+    # Ask model to find most similar target.
     answers_index = model.find_most_similar_vector(find)
     for index in answers_index:
         answer = model.get_word_by_index(index)
-        print("Answer is {}".format(answer))
+        print(answer)
 

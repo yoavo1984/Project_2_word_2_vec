@@ -1,0 +1,33 @@
+Readme for Project 2.
+
+The project has 4 relevant modules:
+-----------------------------------
+
+1. dataset - In charge of reading, processing and enabling access to the dataset which
+   in this exercise comprises of the datasetSentences file.
+
+2. Evaluations - In charge of the evaluations part and creating the deliverable's.
+
+3. learning - Holds the gradient descent(ascent in out case) class in charge of preforming
+   mini batch gradient ascent and it's equivalent hyperparameters class.
+
+4. model - Holds the model,  and the model file holds the alpha unigram model as well.
+   Also stores the model hyperparameters.
+
+We have documented each class quite extensively so we will explain the flow of
+the program here and the class explanation can be find inside the files.
+
+Main Flow
+=========
+You need to set the desired hyper parameters in the configuration file.
+Then run main.py.
+
+First we load the data (in dataset.py), then split the data to train and test using
+the sentence assignments file.
+We change the words in the corpus to ids, for faster retrieval and processing.
+
+We build the unigram model inside the SkipGram model class.
+So the model will use this class to sample k words.
+
+After the model was initialized we start the learning
+as described in the project and class notes.
